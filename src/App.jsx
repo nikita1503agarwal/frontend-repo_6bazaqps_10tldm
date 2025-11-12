@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Spline from '@splinetool/react-spline'
-import { Github, Linkedin, Mail, ArrowDown, ExternalLink, Download, Code2, Star } from 'lucide-react'
+import { Github, Linkedin, Mail, ArrowDown, ExternalLink, Download, Code2, Star, Send } from 'lucide-react'
 
 function Nav() {
   const [open, setOpen] = useState(false)
@@ -216,27 +216,90 @@ function Projects() {
 }
 
 function Contact() {
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
+  const [sending, setSending] = useState(false)
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    setSending(true)
+    const to = 'hello@example.com'
+    const subject = form.subject || `Pesan dari ${form.name || 'Pengunjung'}`
+    const bodyLines = [
+      `Nama: ${form.name}`,
+      `Email: ${form.email}`,
+      '',
+      form.message,
+    ]
+    const body = encodeURIComponent(bodyLines.join('\n'))
+    const mailto = `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${body}`
+    window.location.href = mailto
+    setTimeout(() => {
+      setSending(false)
+      setForm({ name: '', email: '', subject: '', message: '' })
+    }, 600)
+  }
+
   return (
     <section id="contact" className="bg-[#0a0a0a] text-gray-200 py-20 border-t border-white/10">
       <div className="max-w-6xl mx-auto px-4">
         <SectionTitle eyebrow="Kontak" title="Mari terhubung" subtitle="Terbuka untuk diskusi, kolaborasi, atau masukan!" />
-        <div className="mt-10 grid md:grid-cols-2 gap-6">
-          <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-            <h3 className="text-white font-semibold mb-3">Email</h3>
-            <a className="text-emerald-300 hover:text-emerald-200" href="mailto:hello@example.com">hello@example.com</a>
+
+        <div className="mt-10 grid lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 bg-white/5 border border-white/10 rounded-xl p-6">
+            <h3 className="text-white font-semibold mb-4">Kirim Pesan</h3>
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-1">
+                <label htmlFor="name" className="block text-sm text-gray-300 mb-1">Nama</label>
+                <input id="name" name="name" value={form.name} onChange={handleChange} required placeholder="Nama Anda" className="w-full rounded-md bg-black/40 border border-white/10 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-400/40" />
+              </div>
+              <div className="sm:col-span-1">
+                <label htmlFor="email" className="block text-sm text-gray-300 mb-1">Email</label>
+                <input id="email" type="email" name="email" value={form.email} onChange={handleChange} required placeholder="email@contoh.com" className="w-full rounded-md bg-black/40 border border-white/10 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-400/40" />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="subject" className="block text-sm text-gray-300 mb-1">Subjek</label>
+                <input id="subject" name="subject" value={form.subject} onChange={handleChange} placeholder="Judul pesan" className="w-full rounded-md bg-black/40 border border-white/10 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-400/40" />
+              </div>
+              <div className="sm:col-span-2">
+                <label htmlFor="message" className="block text-sm text-gray-300 mb-1">Pesan</label>
+                <textarea id="message" name="message" value={form.message} onChange={handleChange} required rows={5} placeholder="Tulis pesan Anda di sini..." className="w-full rounded-md bg-black/40 border border-white/10 text-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-400/40" />
+              </div>
+              <div className="sm:col-span-2 flex items-center gap-3">
+                <button type="submit" disabled={sending} className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 text-black font-medium px-5 py-2.5 rounded-md transition">
+                  <Send size={18} /> {sending ? 'Mengirim…' : 'Kirim via Email'}
+                </button>
+                <a href="mailto:hello@example.com" className="text-sm text-gray-400 hover:text-gray-300">Atau langsung email ke hello@example.com</a>
+              </div>
+            </form>
           </div>
+
           <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-            <h3 className="text-white font-semibold mb-3">Media Sosial</h3>
-            <div className="flex items-center gap-3">
-              <a className="p-2 rounded-md bg-white/10 hover:bg-white/20 transition" href="https://github.com/" target="_blank" rel="noreferrer" aria-label="GitHub">
-                <Github size={20} />
-              </a>
-              <a className="p-2 rounded-md bg-white/10 hover:bg-white/20 transition" href="https://linkedin.com/" target="_blank" rel="noreferrer" aria-label="LinkedIn">
-                <Linkedin size={20} />
-              </a>
+            <h3 className="text-white font-semibold mb-3">Info Kontak</h3>
+            <div className="space-y-3">
+              <div>
+                <div className="text-sm text-gray-400">Email</div>
+                <a className="text-emerald-300 hover:text-emerald-200" href="mailto:hello@example.com">hello@example.com</a>
+              </div>
+              <div>
+                <div className="text-sm text-gray-400">Media Sosial</div>
+                <div className="mt-2 flex items-center gap-3">
+                  <a className="p-2 rounded-md bg-white/10 hover:bg-white/20 transition" href="https://github.com/" target="_blank" rel="noreferrer" aria-label="GitHub">
+                    <Github size={20} />
+                  </a>
+                  <a className="p-2 rounded-md bg-white/10 hover:bg-white/20 transition" href="https://linkedin.com/" target="_blank" rel="noreferrer" aria-label="LinkedIn">
+                    <Linkedin size={20} />
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
         <p className="mt-10 text-center text-xs text-gray-500">© {new Date().getFullYear()} Beginner Dev. Dibuat dengan cinta menggunakan React & Tailwind.</p>
       </div>
     </section>
